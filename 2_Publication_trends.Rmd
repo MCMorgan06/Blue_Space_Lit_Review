@@ -1,0 +1,153 @@
+---
+title: "Publication_Trends_2"
+author: "Matthew Morgan"
+date: "2025-02-18"
+output: html_document
+---
+
+## working directory
+
+setwd("C:/Users/721049/OneDrive - hull.ac.uk/Blue Space Review")
+getwd()
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages}
+library(dplyr)
+library(ggplot2)
+library(readr)
+```
+
+```{r data, col_types = TRUE}
+data <- read.csv("Blue_space_paper(lit)_v24.csv")
+```
+
+```{r data_filter}
+names(data)
+unique(data$DOI)
+
+blue_data <- data %>%
+  distinct(DOI, .keep_all = TRUE)
+```
+
+```{r blue_plot}
+yearly_counts <- blue_data %>%
+  mutate(Publication.Year = ifelse(Publication.Year == 2024, 2023, Publication.Year)) %>%
+  group_by(Publication.Year) %>%
+  summarise(total_count = n(), .groups = 'drop')
+
+# Define minimum and maximum years for scale
+min_year <- min(yearly_counts$Publication.Year, na.rm = TRUE)
+max_year <- max(yearly_counts$Publication.Year, na.rm = TRUE)
+
+# Plot the trend line with customizable x-axis ticks and label distance
+p1 <- ggplot(yearly_counts, aes(x = Publication.Year, y = total_count)) +
+  geom_line(color = "black") +
+  geom_point(color = "blue") +
+  labs(
+    title = "",
+    x = "Year",
+    y = "Total Count"
+  ) +
+  scale_x_continuous(breaks = seq(min_year, max_year, by = 1)) +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_text(size = 14, margin = margin(t = 10)),
+    axis.title.y = element_text(size = 14, margin = margin(r = 10)),
+    axis.text.x  = element_text(size = 12, angle = 35, margin = margin(t = 5)),
+    axis.text.y  = element_text(size = 12, margin = margin(r = 5))
+  )
+
+p1
+ggsave("bluespace_publications.png", plot = p1, dpi = 600)
+
+```
+```{r final plots}
+theme_match <- theme(
+  axis.title.x = element_text(size = 14, margin = margin(t = 10)),
+  axis.title.y = element_text(size = 14, margin = margin(r = 10)),
+  axis.text.x  = element_text(size = 12, angle = 35, margin = margin(t = 5)),
+  axis.text.y  = element_text(size = 12, margin = margin(r = 5)),
+  legend.text  = element_text(size = 12)
+)
+
+p1 <- ggplot(yearly_counts, aes(x = Publication.Year, y = total_count)) +
+  geom_line(color = "black") +
+  geom_point(color = "blue") +
+  labs(title = "", x = "Year", y = "Total Count") +
+  scale_x_continuous(breaks = seq(min_year, max_year, by = 1)) +
+  theme_minimal() +
+  theme_match
+
+p1
+ggsave("bluespace_publications.png", plot = p1, dpi = 600)
+pf <- p1 | p
+ggsave("bluespace_publications_final.png", plot = pf, width = 16, height = 6, dpi = 600)
+```
+
+
+```{r green_plot}
+# bring in data
+green_data <- read.csv("Green_space_search_all.csv")
+
+# check for duplicated
+doi <- unique(green_data$DOI)
+
+# remove if needed
+green_data_clean <- green_data %>%
+  distinct(DOI, .keep_all = TRUE)
+
+# Summarize data by year, merging 2024 into 2023
+yearly_counts_green <- green_data %>%
+  mutate(Publication.Year = ifelse(Publication.Year == 2024, 2023, Publication.Year)) %>%
+  group_by(Publication.Year) %>%
+  summarise(total_count = n(), .groups = 'drop')
+
+#
+# Define minimum and maximum years for scale
+min_year <- min(yearly_counts_green$Publication.Year, na.rm = TRUE)
+max_year <- max(yearly_counts_green$Publication.Year, na.rm = TRUE)
+
+# Plot the trend line with customizable x-axis ticks and label distance
+p2 <- ggplot(yearly_counts_green, aes(x = Publication.Year, y = total_count)) +
+  geom_line(color = "blue") +       # Line plot
+  geom_point(color = "red") +       # Add points for better visualization
+  labs(title = "",
+       x = "Year",
+       y = "Total Count") +
+  scale_x_continuous(breaks = seq(min_year, max_year, by = 1)) + # Ensure x-axis has ticks every 1 year
+  theme_minimal() +
+  theme(
+     axis.title.x = element_text(margin = margin(t = 10), size = 14),  # Adjust x-axis label distance
+    axis.title.y = element_text(margin = margin(r = 10), size = 14),  # Adjust y-axis label distance
+    axis.text.x = element_text(margin = margin(t = 5),size = 12, angle = 35),    # Adjust x-axis text distance
+    axis.text.y = element_text(margin = margin(r = 5), size = 12)     # Adjust y-axis text distance
+  )
+p2
+```
+
+```{r biodiversity publications}
+biodiversity_pub_Rplot <- read.csv("biodiversity_pub_Rplot.csv")
+# Plot the trend line with customizable x-axis ticks and label distance
+p3 <- ggplot(biodiversity_pub_Rplot, aes(x = Year, y = Count)) +
+  geom_col(color = "black", fill = "#3c998d") +       
+  labs(
+    title = "",
+    x = "Year",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_text(margin = margin(t = 10), size = 14),
+    axis.title.y = element_text(margin = margin(r = 10), size = 14),
+    axis.text.x  = element_text(margin = margin(t = 5), size = 12, angle = 35),
+    axis.text.y  = element_text(margin = margin(r = 5), size = 12)
+  )
+
+p3
+
+ggsave("bio_publications.png", plot = p3, width = 8, height = 5, dpi = 600)
+```
+
