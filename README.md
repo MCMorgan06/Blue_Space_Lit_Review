@@ -4,9 +4,9 @@ Note for Examiners
 
 Analysis outputs are organised using the following naming convention:
 
-1_ stage 1,
-2_ stage 2,
-3_ stage 3
+1_*,
+2_*,
+3_*
 
 All corresponding files and supporting materials are included within the repository and follow this structure.
 
